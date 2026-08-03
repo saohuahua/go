@@ -1,0 +1,11 @@
+# Go 编译产物
+*.exe
+*.test
+*.out
+
+# Claude Code 本地文件
+.claude/
+
+# 编辑器
+.vscode/
+.idea/
