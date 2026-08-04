@@ -39,5 +39,6 @@ go vet ./slices ./map   # 编译 + 静态检查
 ## 当前进度（截至 2026-08）
 
 - 已完成：`slices/`（切片）、`map/`（map）→ Day4 完成
-- 下一步：Day5 **指针 + go mod**，然后 Day6 **Goroutine + Channel**
+- 已完成：`pointers/`（指针）→ Day5 完成（go mod 速背在 pointers/README 补充节）
+- 下一步：Day6 **Goroutine + Channel**（然后 select、sync、Context）
 - 面试高频清单（切片扩容、Map 底层、GMP 等）在路线文档第四阶段，README 面试速背节对应着写
