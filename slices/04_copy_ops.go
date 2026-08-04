@@ -16,13 +16,13 @@ func demoCopy() {
 	n := copy(b, a)          // 把 a 复制给 b，返回复制成功的个数
 	fmt.Println("a =", a, " b =", b, " 复制个数 =", n)
 
-	b[0] = 100 // 改 b 不影响 a
+	b[0] = 100                             // 改 b 不影响 a
 	fmt.Println("改 b[0] = 100 后，a 仍然是", a) // [1 2 3]
 
 	// 补充：copy 是"能复制多少就复制多少"
 	// 如果目标太短，就只复制目标长度那么多个元素
 	short := make([]int, 2)
-	copy(short, a) // 目标只有 2 个位置，所以只复制 2 个
+	copy(short, a)                              // 目标只有 2 个位置，所以只复制 2 个
 	fmt.Println("目标长度只有 2，复制结果 short =", short) // [1 2]
 
 	// ---------- 2. 删除中间的元素（Go 没有内置 delete） ----------
