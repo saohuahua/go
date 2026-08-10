@@ -1,11 +1,13 @@
 // 01_basics.go —— 上手：初始化 + nil map 大坑 + 增删改查 + comma-ok
 //
 // 先打个比喻，方便你从 JS 思维迁移过来：
-//   map = 一本「字典」：给你一个 key，立刻翻到对应的 value
-//   JS 里你用的对象 {} / new Map() 就是 map，Go 里叫 map
+//
+//	map = 一本「字典」：给你一个 key，立刻翻到对应的 value
+//	JS 里你用的对象 {} / new Map() 就是 map，Go 里叫 map
 //
 // 这一节学完你就能"用" map 了，核心就一句话：
-//   用之前先 make，读之前先确认 key 在不在。
+//
+//	用之前先 make，读之前先确认 key 在不在。
 package main
 
 import "fmt"
@@ -50,7 +52,9 @@ func demoBasics() {
 	scores := make(map[string]int)
 	scores["语文"] = 90    // 没有 → 新增
 	scores["语文"] = 95    // 已有 → 覆盖（改）
+	scores["英语"] = 60    // 
 	delete(scores, "语文") // 删除（删不存在的 key 也不报错）
+	// delete(scores, "数学") // 删除（删不存在的 key 也不报错）
 	fmt.Println("\n增改删之后 scores =", scores, " len =", len(scores))
 
 

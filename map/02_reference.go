@@ -36,7 +36,7 @@ func demoReference() {
 	fmt.Println("🔑 嵌套 map 要一层一层 make，内层是 nil 就写不进去")
 
 	// ---------- 3. 复制陷阱：m2 := m 不是复制！ ----------
-	original := map[string]int{"a": 1}
+	original := map[string]int{"a": 1, "d": 4}
 	m2 := original // 只是让 m2 和 original 指向同一个 map
 	m2["b"] = 2
 	fmt.Println("\n改 m2 后 original =", original) // map[a:1 b:2] ← 也被改了！
@@ -45,6 +45,7 @@ func demoReference() {
 	realCopy := make(map[string]int, len(original))
 	for k, v := range original {
 		realCopy[k] = v
+		fmt.Println(realCopy[k]) // 顺序是乱的，随机的，不唯一
 	}
 	realCopy["c"] = 3
 	fmt.Println("改 realCopy 后 original =", original) // map[a:1 b:2] ← 不受影响
