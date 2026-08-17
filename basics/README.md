@@ -26,8 +26,8 @@ go run .          # 一次跑完所有演示
 
 | 文件 | 内容 | 对应 Gin / 项目 的用处 |
 | --- | --- | --- |
-| [01_interface.go](01_interface.go) | 接口：隐式实现、多态、any、类型断言 | http.Handler、分层架构解耦、mock 测试 |
-| [02_error.go](02_error.go) | 错误处理：err!=nil、%w 包裹、errors.Is/As | 统一错误处理、GORM 的 ErrRecordNotFound |
+| [01_interface.go](01_interface.go) | 接口速览：隐式实现、多态、any、类型断言（完整版在 [interface/](interface/) 专题） | http.Handler、分层架构解耦、mock 测试 |
+| [02_error.go](02_error.go) | 错误处理：err!=nil、%w 包裹、errors.Is/As（完整版在 [error/](error/) 专题） | 统一错误处理、GORM 的 ErrRecordNotFound |
 | [03_defer.go](03_defer.go) | defer：栈序、参数立即求值、recover | 关连接、事务回滚、Recovery 中间件 |
 | [04_closure.go](04_closure.go) | 闭包：函数当值、捕获、中间件模式 | Gin 中间件（认证 / CORS / 限流） |
 
@@ -70,5 +70,7 @@ go run .          # 一次跑完所有演示
 ## 下一步
 
 - 🔴 这 4 个是进 Gin 的门票，补完直接上 Week3（net/http → Gin）
+- 🔴 接口是重中之重，完整专题在 [interface/](interface/) 文件夹（定义 → 使用场景 → mock → 标准库 → 断言）
+- 🟡 错误处理完整专题在 [error/](error/) 文件夹（接口 → 造错误 → 错误链 → 自定义错误 → 实战规范）
 - 🟡 struct tag + JSON、字符串/strconv 到 Gin 里**边用边学**，现在不用专门补
 - 泛型（1.18+）面试会问一嘴，但写 Gin 用不到，放最后再补
