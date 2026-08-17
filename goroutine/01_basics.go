@@ -37,6 +37,7 @@ func demoBasics() {
 	fmt.Println("\n⑤ 开 10 个协程，打印顺序每次都不相同：")
 	for i := 0; i < 10; i++ {
 		go fmt.Println("协程", i) // 把 i 当参数直接传，不经过闭包
+		// go func() { fmt.Println(i) }() 
 	}
 	time.Sleep(10 * time.Millisecond)
 	// 融会贯通：map/03 里 range 遍历顺序随机，这里协程执行顺序也随机
@@ -48,6 +49,19 @@ func demoBasics() {
 	//?     —— 协程真跑时 i 可能已变到最后一个值，全打印同一个数；
 	//?     Go 1.22+ 已修复（每轮一个独立 i）。但"传值=快照 / 捕获=引用"
 	//?     的语义呼应 pointers/02 的传值 vs 传指针，面试常考，两种写法都要会看
+
+	//* 眼见为实：Go 1.22 只修了"循环变量"这个特例，"捕获=引用"的语义还在
+	//   循环外照样能看出区别 —— 同一条协程里，传参和闭包看到两个不同的数
+	fmt.Println("\n⑥ 传值 vs 闭包捕获（结果固定，多跑几遍也一样）：")
+	x := 1
+	release := make(chan struct{}) // 借 02 的 channel 当"闸门"：先堵住，改完再放行
+	go func(v int) {
+		<-release // 堵在这，等 x 改成 999 才放行 —— 保证"先改、后看"
+		fmt.Println("   传参（go 那一刻复印）：v =", v, "   闭包（跑的那一刻开盒子）：x =", x)
+	}(x)
+	x = 999 // 先改盒子再放行：传参早已复印好不受影响，闭包看到的是最新值
+	close(release)
+	time.Sleep(time.Millisecond) // 主函数退出 = 协程全没（本节最大的坑），睡一觉等它打印完
 
 	fmt.Println("\n🔑 本章主线：主函数不会等协程，协程也不会等你")
 	fmt.Println("   等协程的正规武器 = channel（下一节）和 WaitGroup（04 节）")

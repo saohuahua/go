@@ -8,7 +8,9 @@
 // 但 Go 的 channel 有个 JS 没有的硬规矩：无缓冲时，收发双方必须"同时在场"。
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // demoChannel 演示 channel 的收发 + 无缓冲 channel 的"同步阻塞"
 func demoChannel() {

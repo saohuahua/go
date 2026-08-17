@@ -40,5 +40,8 @@ go vet ./slices ./map   # 编译 + 静态检查
 
 - 已完成：`slices/`（切片）、`map/`（map）→ Day4 完成
 - 已完成：`pointers/`（指针）→ Day5 完成（go mod 速背在 pointers/README 补充节）
-- 下一步：Day6 **Goroutine + Channel**（然后 select、sync、Context）
+- 已完成：`goroutine/`（Goroutine + Channel）→ Day6 完成
+- 已完成：`sync_context/`（Mutex/select/Context 并发控制）→ Day7 完成
+- 已完成：`basics/`（接口/error/defer/闭包 前置补课）→ 进 Gin 前补的 4 个基础语法
+- 下一步：第二阶段 Week3 **Gin 框架**（先 net/http 预热，再 Gin 路由/中间件/参数绑定）
 - 面试高频清单（切片扩容、Map 底层、GMP 等）在路线文档第四阶段，README 面试速背节对应着写
