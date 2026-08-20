@@ -32,6 +32,13 @@ func (SMSNotifier) Notify(userID int, msg string) error {
 	return nil
 }
 
+type Wechater struct{}
+
+func (Wechater) Notify(userID int, msg string) error {
+	fmt.Println("   [微信] 发给用户", userID, "：", msg)
+	return nil
+}
+
 // ---------- 用法①：接口作为函数参数（面向接口编程）----------
 // 邮件能传、短信能传、以后加个微信通知 —— 这个函数永远不用改
 func sendWelcome(n Notifier, userID int) {
@@ -58,6 +65,7 @@ func demoUse() {
 	fmt.Println("① 函数参数（面向接口编程）：")
 	sendWelcome(EmailNotifier{}, 1)
 	sendWelcome(SMSNotifier{}, 2)
+	sendWelcome(Wechater{}, 3)
 
 	// ---------- 用法②：结构体字段（依赖注入）----------
 	fmt.Println("② 结构体字段（依赖注入）：")
@@ -65,6 +73,9 @@ func demoUse() {
 	svc.PlaceOrder(100)
 	svc.Notifier = SMSNotifier{} // 随时换成短信，业务代码一行没动
 	svc.PlaceOrder(101)
+
+	svc.Notifier = Wechater{}
+	svc.PlaceOrder(102)
 
 	// ---------- 用法③：函数返回值（工厂）----------
 	fmt.Println("③ 函数返回值（工厂函数）：")

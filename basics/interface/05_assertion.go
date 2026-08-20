@@ -6,7 +6,8 @@
 //	Go：any 类型想用，得先"断言"（v, ok := x.(T) / switch v := x.(type)）
 //
 // 场景：JSON 反序列化到 any、Gin 的 gin.H、第三方库返回 any ——
-//   拿到的都是"不知道类型的东西"，想用必须掏出来。日常开发天天见。
+//
+//	拿到的都是"不知道类型的东西"，想用必须掏出来。日常开发天天见。
 package main
 
 import "fmt"
@@ -22,7 +23,7 @@ func demoAssertion() {
 
 	// 写法 B：comma-ok —— 安全，推荐（呼应 map / channel 的 comma-ok）
 	if s, ok := x.(string); ok {
-		fmt.Println("① 断言成功：x 是 string：", s)
+		fmt.Println("① 断言成功：x 是 string：", s, ok)
 	}
 	if n, ok := x.(int); ok {
 		fmt.Println("① 不会走到：", n)
@@ -40,10 +41,10 @@ func demoAssertion() {
 	// ---------- ③ 实战：从 map[string]any 里取值 ----------
 	// json.Unmarshal 到 any 得到的就是 map[string]any（模拟接口返回的未知数据）
 	payload := map[string]any{
-		"name":  "小明",
-		"age":   float64(18), // 注意：JSON 数字反序列化后默认是 float64！
-		"tags":  []any{"前端", "Go"},
-		"isVIP": true,
+		"name":   "小明",
+		"age":    float64(18), // 注意：JSON 数字反序列化后默认是 float64！
+		"tags":   []any{"前端", "Go"},
+		"isVIP":  true,
 		"nested": map[string]any{"city": "上海"},
 	}
 

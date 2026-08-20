@@ -1,10 +1,12 @@
 // 03_wrap.go —— 错误链：%w 包裹 + errors.Is / errors.As（面试高频，重点）
 //
 // 场景：错误从底层一路传上来，每一层都想"加一句说明"（我在哪层、参数是啥）。
-//   用 fmt.Errorf + %w 包一层：既能带上上下文，又能把底层错误留在"链"里。
-//   之后 errors.Is / errors.As 就能穿透这串链条，判断"最里面是不是这个错"。
+//
+//	用 fmt.Errorf + %w 包一层：既能带上上下文，又能把底层错误留在"链"里。
+//	之后 errors.Is / errors.As 就能穿透这串链条，判断"最里面是不是这个错"。
 //
 // 前端对照：
+//
 //	JS：只能 instanceof 检查最外层错误，内层要靠 err.cause 手动挖
 //	Go：errors.Is / errors.As 自动穿透包裹链 —— Go 1.13 之后的核心能力，面试必问
 package main
