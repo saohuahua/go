@@ -1,6 +1,6 @@
 // 03_response_json.go —— Response：状态码、响应头、JSON 和 struct tag
 //
-// API 响应至少要表达两件事
+// API 响应必须表达状态码和 Content-Type
 //
 // 状态码说明结果
 // Content-Type 告诉客户端如何解析 body
