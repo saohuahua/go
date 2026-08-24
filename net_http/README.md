@@ -65,6 +65,17 @@ go run .
 4. **普通 map 扛并发 HTTP 请求**：会产生 data race，严重时 `concurrent map writes` 直接崩溃
 5. **手写路由时不区分 404 和 405**：路径不存在是 404，路径存在但 method 不支持是 405
 
+## 怎么自测
+
+```bash
+go test ./net_http
+```
+
+测试覆盖 TODO API 的成功路径、JSON 和参数错误、404 与 405、并发创建
+
+> 当前 Windows 386 环境不支持 `go test -race`
+> 代码已使用 `RWMutex` 保护共享 map 和自增 ID，切换到支持 race detector 的环境后再运行 `go test -race ./net_http`
+
 ## 下一步
 
 进入 `gin/` 学习目录
