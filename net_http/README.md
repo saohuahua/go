@@ -51,6 +51,7 @@ go run .
 - **请求读取**：`r.Method` 取方法，`r.URL.Path` 取路径，`r.URL.Query().Get` 取 query，`r.Header.Get` 取请求头
 - **响应顺序**：先 `Header().Set`，再 `WriteHeader`，最后写 body
 - **默认状态码**：不显式 `WriteHeader` 时，第一次 `Write` 默认返回 200
+- **请求 body**：Server 会在请求结束后自动关闭 `r.Body`，Handler 不需要 `defer r.Body.Close()`
 - **JSON 输入错误**：`Decoder.Decode` 失败返回 400，业务错误不能 panic
 - **中间件结构**：`func(next http.Handler) http.Handler`，一层包一层形成洋葱模型
 - **请求 Context**：从 `r.Context()` 派生并用 `r.WithContext(ctx)` 传给下游，不能存进 struct

@@ -139,8 +139,6 @@ func handleGetTodos(w http.ResponseWriter, r *http.Request, store *todoStore) {
 }
 
 func handleCreateTodo(w http.ResponseWriter, r *http.Request, store *todoStore) {
-	defer r.Body.Close()
-
 	var input todo
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&input); err != nil {
