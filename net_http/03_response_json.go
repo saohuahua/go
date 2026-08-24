@@ -1,6 +1,6 @@
 // 03_response_json.go —— Response：状态码、响应头、JSON 和 struct tag
 //
-// API 响应必须表达状态码和 Content-Type
+// 本节只看状态码和 Content-Type
 //
 // 状态码说明结果
 // Content-Type 告诉客户端如何解析 body
@@ -42,7 +42,7 @@ func demoResponseJSON() {
 	}
 	fmt.Printf("② 解码后：%+v\n", input)
 
-	//! 真实 Handler 拿到 body 后立刻 defer r.Body.Close()
+	//! Server 会自动关闭请求 body，不需要在 Handler 里 defer r.Body.Close()
 	//! JSON 解码失败属于客户端输入错误，应返回 400，不能 panic
 
 	//* Gin 对照：writeJSON(...) → c.JSON(...)
