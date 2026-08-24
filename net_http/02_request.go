@@ -14,10 +14,11 @@ func demoRequest() {
 	fmt.Println("\n========== 02 Request：读取请求 ==========")
 
 	// URL 的 ? 后是 query string，同名 key 可以有多个值
+	// 所以 Query() 返回 url.Values = map[string][]string（值是切片，因为 key 可重复）
 	req := httptest.NewRequest(
 		http.MethodGet,
 		"http://example.com/articles?page=2&tag=go&tag=http",
-		nil,
+		nil, // 第三个参数是 body；GET 没有 body，传 nil
 	)
 	req.Header.Set("X-Request-ID", "req-123")
 
@@ -27,8 +28,8 @@ func demoRequest() {
 	fmt.Println("④ tags =", req.URL.Query()["tag"])
 	fmt.Println("⑤ X-Request-ID =", req.Header.Get("X-Request-ID"))
 
-	// Get 取不到时返回空字符串
-	// 要区分“没传”和“传空值”时，使用 map 的 comma-ok
+	// Get 取不到时返回空字符串，但没法区分「没传」和「传了空值」
+	// 用 map 的 comma-ok：query["keyword"] 直接当下标取，返回 (值, 是否存在)
 	query := req.URL.Query()
 	_, hasKeyword := query["keyword"]
 	fmt.Println("⑥ keyword 是否传入 =", hasKeyword)

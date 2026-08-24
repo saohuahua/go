@@ -34,10 +34,12 @@ type errorResponse struct {
 
 // todoStore 管理共享的 TODO 数据
 // HTTP Server 会并发调用 Handler，因此 map 和 nextID 必须加锁
+// 前端对照：JS 单线程没有这个问题；Go 里多个 goroutine 同时读写 map 会 panic
+// RWMutex = 读锁(R) + 写锁(W)：多个读可并发，写是排他的
 type todoStore struct {
-	mu     sync.RWMutex
-	nextID int
-	todos  map[int]todo
+	mu     sync.RWMutex // 保护 todos 和 nextID 的读写锁
+	nextID int           // 自增 ID 计数器，create 时 +1
+	todos  map[int]todo  // 真正的数据
 }
 
 func newTodoStore() *todoStore {
@@ -48,6 +50,7 @@ func newTodoStore() *todoStore {
 }
 
 func (s *todoStore) create(input todo) todo {
+	// 写操作：整个函数持写锁，保证 nextID++ 和写 map 是一个不可分割的整体
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -58,10 +61,11 @@ func (s *todoStore) create(input todo) todo {
 }
 
 func (s *todoStore) list() []todo {
+	// 读操作：用 RLock，多个读请求可同时进行、互不阻塞
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	// map 遍历顺序不固定，按 ID 填入切片保证接口输出稳定
+	// map 遍历顺序不固定，按 ID 从小到大填入切片，保证接口输出稳定（前端好断言）
 	result := make([]todo, 0, len(s.todos))
 	for id := 1; id < s.nextID; id++ {
 		if item, ok := s.todos[id]; ok {
@@ -90,8 +94,8 @@ func (s *todoStore) delete(id int) bool {
 	return true
 }
 
-// todoAPI 是最小路由器
-// 真实项目会由 Gin 根据 method 和 path 帮你分发到不同 Handler
+// todoAPI 是最小路由器：一个 Handler 里按 path 分流，相当于手写路由表
+// 真实项目会由 Gin 根据 method 和 path 帮你分发到不同 Handler，省掉这段 switch
 func todoAPI(store *todoStore) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
