@@ -25,8 +25,8 @@ import "fmt"
 func main() {
 	// demoServer() // 01 HTTP Server + Handler
 	// demoRequest() // 02 读取请求
-	demoResponseJSON() // 03 写 JSON 响应
-	// demoRouterMiddleware() // 04 路由 + 中间件
+	// demoResponseJSON() // 03 写 JSON 响应
+	demoRouterMiddleware() // 04 路由 + 中间件
 	// demoTodoAPI()          // 05 内存 TODO API
 
 	fmt.Println("\n🎉 net/http 预热完成：现在知道 Gin 帮你封装了什么，可以进 Gin 了")
