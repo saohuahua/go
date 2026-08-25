@@ -24,6 +24,9 @@ func demoRequest() {
 
 	fmt.Println("① method =", req.Method)
 	fmt.Println("② path =", req.URL.Path)
+	fmt.Println("② HOST =", req.Host)
+	fmt.Println("② req.Body =", req.Body)
+
 	fmt.Println("③ page =", req.URL.Query().Get("page"))
 	fmt.Println("④ tags =", req.URL.Query()["tag"])
 	fmt.Println("⑤ X-Request-ID =", req.Header.Get("X-Request-ID"))

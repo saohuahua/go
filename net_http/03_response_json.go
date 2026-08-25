@@ -26,8 +26,12 @@ type article struct {
 func demoResponseJSON() {
 	fmt.Println("\n========== 03 Response：JSON 请求和响应 ==========")
 
+	//? 为什么用 httptest？本 demo 没起真实服务器——NewRecorder 造一个假的 ResponseWriter，
+	//? 不联网，写入全存内存，下面 rec.Code / rec.Header / rec.Body 再读出来看
+	//* 前端对照：rec ≈ { status:0, headers:{}, body:'' } 的空对象，写完打开看
 	rec := httptest.NewRecorder()
 	writeJSON(rec, http.StatusCreated, article{ID: 1, Title: "学 net/http", Published: true})
+	// ↑ 把 status=201 + Content-Type + JSON body 全写进了 rec 的内存，下面三行读出来：
 	fmt.Printf("① status=%d, Content-Type=%q, body=%s\n",
 		rec.Code,
 		rec.Header().Get("Content-Type"),
@@ -36,14 +40,17 @@ func demoResponseJSON() {
 
 	// 从请求 body 解 JSON：NewDecoder(r.Body).Decode(&input) 把 body 填进 input
 	// 前端对照：≈ JSON.parse(await req.text()) 再手动赋值；Go 用 tag 自动映射字段
+	// strings.NewReader：字符串不能直接当 body（body 须是 io.Reader，能被流式读），包一层即可
 	body := strings.NewReader(`{"title":"写 TODO API","published":false}`)
-	req := httptest.NewRequest(http.MethodPost, "/articles", body)
-	var input article
+	req := httptest.NewRequest(http.MethodPost, "/articles", body) // 手搓一个「客户端发来的 POST 请求」，req.Body 即客户端 JSON
+	var input article                                              // 全零结构体，准备接收
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
 		fmt.Println("② JSON 解析失败：", err)
 		return
 	}
-	fmt.Printf("② 解码后：%+v\n", input)
+	// Decode(&input) 必须传指针：Go 值传递，不传 & 只改到一份拷贝，外头拿不到结果
+	// 请求没带 id 字段 → input.ID 保持零值 0；缺失字段不报错
+	fmt.Printf("② 解码后：%+v\n", input) // %+v 带字段名打印，一眼看清每个字段
 
 	//! Server 会自动关闭请求 body，不需要在 Handler 里 defer r.Body.Close()
 	//! JSON 解码失败属于客户端输入错误，应返回 400，不能 panic
