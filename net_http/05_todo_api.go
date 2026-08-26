@@ -38,8 +38,8 @@ type errorResponse struct {
 // RWMutex = 读锁(R) + 写锁(W)：多个读可并发，写是排他的
 type todoStore struct {
 	mu     sync.RWMutex // 保护 todos 和 nextID 的读写锁
-	nextID int           // 自增 ID 计数器，create 时 +1
-	todos  map[int]todo  // 真正的数据
+	nextID int          // 自增 ID 计数器，create 时 +1
+	todos  map[int]todo // 真正的数据
 }
 
 func newTodoStore() *todoStore {
@@ -189,6 +189,7 @@ func demoTodoAPI() {
 	api := todoAPI(newTodoStore())
 	showTodoRequest(api, http.MethodGet, "/health", "")
 	showTodoRequest(api, http.MethodPost, "/todos", `{"text":"学 net/http"}`)
+	showTodoRequest(api, http.MethodPost, "/todos", `{"text":"吃 net/http"}`)
 	showTodoRequest(api, http.MethodGet, "/todos", "")
 	showTodoRequest(api, http.MethodGet, "/todos?id=1", "")
 	showTodoRequest(api, http.MethodDelete, "/todos?id=1", "")
