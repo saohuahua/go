@@ -44,6 +44,77 @@ go run .
 | `r.Context()` | 请求取消和请求元信息沿调用链传递 | `AbortController` |
 | `RWMutex` | 保护并发读写的内存 TODO 数据 | JS 单线程通常不需要 |
 
+## 中间件专题：洋葱模型全解析
+
+> 对应 [04_router_middleware.go](04_router_middleware.go)，把「组装 → 请求穿 → 取回数据」整条链路说透
+
+### 1. 中间件是什么
+
+```go
+type middleware func(http.Handler) http.Handler
+```
+
+吃进一个 `http.Handler`，返回一个「包好一层的新 Handler」。它不改原 handler，只返回新的——所以调用时必须接住返回值。
+
+前端对照：装饰器 / Axios 拦截器 / Express 的 `app.use`
+
+### 2. 组装：applyMiddleware 为什么倒着包
+
+```go
+handler := applyMiddleware(mux, requestIDMiddleware, loggerMiddleware)
+// 目标结构 = requestID( logger( mux ) )，requestID 最外层、最先进入
+```
+
+参数第 1 个 mux 是最里层，中间件按「想让它多外层」排序。要套成 `requestID( logger( mux ) )`，只能从最里层开始一个个往外套——先套 logger，再套 requestID，这就是 `for i := len(middlewares)-1; i >= 0; i--` **倒着循环**的原因。
+
+```
+i=1: handler = logger(mux)                → logger 包住 mux
+i=0: handler = requestID( logger(mux) )   → requestID 包住整体
+```
+
+`handler = middlewares[i](handler)` 这个赋值必须写：中间结果不存回去，包好的那层就丢了（白包）。
+
+### 3. 请求完整路径（核心）
+
+`handler.ServeHTTP(rec, req)` 触发后（真实服务器最后也是这一句），请求从最外层穿到最里层再穿出来：
+
+```
+handler.ServeHTTP(rec, req)
+│
+├─ requestIDMiddleware  外层：ctx 挂 id → r.WithContext 换新请求 → next
+│     └─ loggerMiddleware  中层：记开始时间 → next
+│           └─ mux 路由器：匹配 "GET /hello" → 调业务 handler
+│                 └─ 业务 handler：从 ctx 取回 id → 写响应
+│           └─ logger 退出：打印耗时
+└─ requestID 退出：无收尾代码
+```
+
+三个关键点：
+- **w 一路原样传**：`http.ResponseWriter` 从最外层传到最里层，中间件一般不动它
+- **r 换过一次**：`r.WithContext(ctx)` 返回一份拷贝（ctx 换新的、其余照旧），只有下游能读到新 ctx；原 r 的 ctx 不变
+- **洋葱进出顺序**：先进先出、后进后出，每层的「进」和「出」都夹着 `next.ServeHTTP(w, r)`
+
+### 4. 请求元信息靠 Context 传，不能存全局
+
+```go
+ctx := context.WithValue(r.Context(), requestIDKey{}, "req-demo-001")  // ① 挂上去
+next.ServeHTTP(w, r.WithContext(ctx))                                 // ② 换新请求传下去
+requestID, _ := r.Context().Value(requestIDKey{}).(string)            // ③ 最里层取回来
+```
+
+- `WithValue` **不改原 ctx**，返回派生新 ctx，① ② 两步都必须用返回值
+- `.(string)` 是类型断言：`Value()` 返回 `interface{}`（空接口），断言回字符串；正式代码应写成 `id, ok := ...` 再 `if !ok` 兜底
+- 为什么不存全局变量/struct：HTTP 请求并发执行，共享一个全局会串数据（A 请求写进去、B 请求读到）；ctx 跟着这次请求走，天然隔离
+
+### 5. 路由 vs 中间件：分工
+
+| | 路由（mux） | 中间件 |
+| --- | --- | --- |
+| 管什么 | 按 method + path 分发到业务 handler | 所有请求的通用逻辑（日志、鉴权、挂 id） |
+| 会不会拒请求 | 会：路径存在但方法不对 → 自动 **405** + `Allow` 头；路径不存在 → 404 | 不会，只包不拦（拦不拦由它自己决定） |
+| 只对某些方法生效？ | 是，`"GET /hello"` 只匹配 GET | 否，对所有方法都穿一遍 |
+| Gin 对应 | `router.GET(...)` | `router.Use(...)` |
+
 ## 面试速背
 
 - **`http.Handler`**：只要实现 `ServeHTTP(ResponseWriter, *Request)` 就能处理 HTTP 请求
