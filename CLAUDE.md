@@ -11,7 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 go run ./slices     # 运行切片学习项目（或 cd slices && go run .）
 go run ./map        # 运行 map 学习项目
-go vet ./slices ./map   # 编译 + 静态检查
+go run ./gin        # 运行 Gin 学习项目（外部依赖已写入根 go.mod）
+go vet ./slices ./map ./gin   # 编译 + 静态检查
 ```
 
 - 没有测试；每个学习文件夹是独立可运行的 `package main`，多个 main 包共存没问题
@@ -44,5 +45,9 @@ go vet ./slices ./map   # 编译 + 静态检查
 - 已完成：`sync_context/`（Mutex/select/Context 并发控制）→ Day7 完成
 - 已完成：`basics/`（接口/error/defer/闭包 前置补课）→ 进 Gin 前补的 4 个基础语法
 - 已完成：`basics/interface/`（接口专题：定义/使用场景/mock/标准库/断言）→ 接口完整版
-- 下一步：第二阶段 Week3 **Gin 框架**（先 net/http 预热，再 Gin 路由/中间件/参数绑定）
+- 已完成：`json_file/`（JSON 序列化/文件 IO/Reader-Writer）→ Week2 Day2
+- 已完成：`net_http/`（HTTP Server 预热：Handler/请求响应/路由中间件/内存 TODO API）→ Week2 Day4-7
+- 已完成：`review_practice/`（综合回顾练习：从零补全内存 TODO 服务）
+- 已完成：`gin/`（Gin 框架：路由/参数绑定/中间件/校验/JWT/用 Gin 重写 TODO API）→ Week3 完成
+- 下一步：**分层项目骨架**（cmd/internal/pkg 分层 + Swagger）→ 之后 Week4 GORM + MySQL
 - 面试高频清单（切片扩容、Map 底层、GMP 等）在路线文档第四阶段，README 面试速背节对应着写
