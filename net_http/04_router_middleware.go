@@ -58,6 +58,7 @@ func demoRouterMiddleware() {
 	fmt.Println("🔑 路由负责分发，中间件负责通用横切逻辑")
 }
 
+// middlewares 类型就是 []middleware, 切片
 func applyMiddleware(final http.Handler, middlewares ...middleware) http.Handler {
 	handler := final
 	for i := len(middlewares) - 1; i >= 0; i-- {
