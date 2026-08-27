@@ -42,6 +42,7 @@ type todoStore struct {
 	todos  map[int]todo // 真正的数据
 }
 
+// newTodoStore 新建空 store，ID 从 1 开始
 func newTodoStore() *todoStore {
 	return &todoStore{
 		nextID: 1,
@@ -75,6 +76,8 @@ func (s *todoStore) list() []todo {
 	return result
 }
 
+// get 按 id 查一个 TODO
+// 查不到时返回 todo 零值 + false——Go 惯例（≈ JS 的 find 找不到返回 undefined）
 func (s *todoStore) get(id int) (todo, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -83,6 +86,7 @@ func (s *todoStore) get(id int) (todo, bool) {
 	return item, ok
 }
 
+// delete 删除 TODO，返回是否真的删掉了（不存在时 false）
 func (s *todoStore) delete(id int) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -109,6 +113,8 @@ func todoAPI(store *todoStore) http.Handler {
 	})
 }
 
+// handleTodos 按 method 分流到增删查 Handler
+// 不支持的 method 回 405 + Allow 头（告诉客户端支持哪些方法）
 func handleTodos(w http.ResponseWriter, r *http.Request, store *todoStore) {
 	switch r.Method {
 	case http.MethodGet:
@@ -123,6 +129,7 @@ func handleTodos(w http.ResponseWriter, r *http.Request, store *todoStore) {
 	}
 }
 
+// handleGetTodos：不带 ?id= 返回全部；带 ?id= 查单个，参数非法或不存在回 400/404
 func handleGetTodos(w http.ResponseWriter, r *http.Request, store *todoStore) {
 	idText := r.URL.Query().Get("id")
 	if idText == "" {
@@ -142,9 +149,11 @@ func handleGetTodos(w http.ResponseWriter, r *http.Request, store *todoStore) {
 	writeJSON(w, http.StatusOK, item)
 }
 
+// handleCreateTodo：解析 body → 校验 text 非空 → 入库，成功回 201 + 带 id 的完整对象
 func handleCreateTodo(w http.ResponseWriter, r *http.Request, store *todoStore) {
 	var input todo
 	decoder := json.NewDecoder(r.Body)
+	//! 解析失败 / text 为空都是客户端输入错误 → 4xx；Server 不因坏输入而 500 或 panic
 	if err := decoder.Decode(&input); err != nil {
 		writeAPIError(w, http.StatusBadRequest, "JSON 格式错误")
 		return
@@ -158,6 +167,7 @@ func handleCreateTodo(w http.ResponseWriter, r *http.Request, store *todoStore) 
 	writeJSON(w, http.StatusCreated, created)
 }
 
+// handleDeleteTodo：删成功回 204（无 body）；查无此 id 回 404
 func handleDeleteTodo(w http.ResponseWriter, r *http.Request, store *todoStore) {
 	id, ok := parseTodoID(w, r.URL.Query().Get("id"))
 	if !ok {
@@ -170,6 +180,8 @@ func handleDeleteTodo(w http.ResponseWriter, r *http.Request, store *todoStore) 
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// parseTodoID 把 query 里的字符串 id 转成 int 并校验为正整数
+// 失败时已写好 400 响应，返回 false，调用方直接 return
 func parseTodoID(w http.ResponseWriter, text string) (int, bool) {
 	id, err := strconv.Atoi(text)
 	if err != nil || id <= 0 {
@@ -179,6 +191,7 @@ func parseTodoID(w http.ResponseWriter, text string) (int, bool) {
 	return id, true
 }
 
+// writeAPIError 统一错误格式：{ "error": "..." }
 func writeAPIError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, errorResponse{Error: message})
 }
@@ -202,6 +215,8 @@ func demoTodoAPI() {
 	fmt.Println("🔑 一个 API 的闭环：路由 → 解析输入 → 校验 → 业务 → 状态码 + JSON")
 }
 
+// showTodoRequest 用 httptest 发一个假请求并打印「方法 路径 → 状态码 body」
+// 不真实联网，纯内存模拟，方便在 demo 里演示整个 API 闭环
 func showTodoRequest(handler http.Handler, method, path, body string) {
 	req := httptest.NewRequest(method, "http://example.com"+path, strings.NewReader(body))
 	if body != "" {
