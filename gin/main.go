@@ -23,21 +23,37 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
+func gintest() {
+	e := gin.Default()
+	e.GET("/findUser/:uid/:name", findUser)
+	// e.GET("/downloadFile/*filePath",UserPage)
+
+	log.Fatalln(e.Run(":8080"))
+}
+
+func findUser(c *gin.Context) {
+	uid := c.Param("uid")
+	username := c.Param("username")
+	c.String(http.StatusOK, "username is %s\n userid is %s", username, uid)
+}
+
 func main() {
 	// TestMode：关掉 Gin 的 debug 启动打印，demo 输出干净
 	// 真实项目设 gin.ReleaseMode：不打 debug 日志，性能也更好
-	gin.SetMode(gin.TestMode)
+	// gin.SetMode(gin.TestMode)
 
-	demoRouter()     // 01 路由
-	demoBinding()    // 02 参数绑定
-	demoMiddleware() // 03 中间件
-	demoValidate()   // 04 校验 + 统一响应
-	demoJWT()        // 05 JWT
-	demoTodoAPI()    // 06 TODO API
+	// demoRouter()     // 01 路由
+	// demoBinding()    // 02 参数绑定
+	// demoMiddleware() // 03 中间件
+	// demoValidate()   // 04 校验 + 统一响应
+	// demoJWT()        // 05 JWT
+	// demoTodoAPI()    // 06 TODO API
 
 	fmt.Println("\n🎉 Gin 速通完成：下一步 GORM + MySQL，或直接搭分层项目骨架")
 }

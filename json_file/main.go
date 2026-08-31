@@ -22,13 +22,23 @@ package main
 
 import "fmt"
 
+type MyInt int
+
+func (i *MyInt) Set(val int) {
+	*i = MyInt(val) // 修改了，但是不会造成任何影响
+}
+
 func main() {
 	// 依次演示，建议逐个放开调用，边看输出边理解
-	demoJSONBasics()    // 01 Marshal / Unmarshal / tag
-	demoJSONZeroValue() // 02 零值困境
-	demoTimeFormat()    // 03 time 布局 / 时区
-	demoFileIO()        // 04 文件读写
-	demoReaderWriter()  // 05 流式 IO
+	// demoJSONBasics() // 01 Marshal / Unmarshal / tag
+	// demoJSONZeroValue() // 02 零值困境
+	// demoTimeFormat()    // 03 time 布局 / 时区
+	// demoFileIO()        // 04 文件读写
+	// demoReaderWriter()  // 05 流式 IO
 
-	fmt.Println("\n🎉 json_file 完成：数据的进出都通了，参数绑定和配置管理有地基了")
+	myInt := MyInt(1)
+	myInt.Set(2)
+	fmt.Println(myInt)
+
+	// fmt.Println("\n🎉 json_file 完成：数据的进出都通了，参数绑定和配置管理有地基了")
 }
