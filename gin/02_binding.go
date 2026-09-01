@@ -20,7 +20,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 // createUserInput 演示一个字段挂多种 tag（binding 是校验规则，04 章细讲）
 type createUserInput struct {
 	Name string `json:"name" form:"name" uri:"name" binding:"required"`
@@ -45,7 +44,6 @@ func demoBinding() {
 
 	router := gin.New()
 
-
 	// ---- 取一两个零散参数：便捷方法最省事 ----
 	router.GET("/search", func(c *gin.Context) {
 		// Query：参数不存在时返回空串，不报错
@@ -60,7 +58,6 @@ func demoBinding() {
 		})
 	})
 
-
 	// ---- 字段多时：struct 绑定 query ----
 	router.GET("/users", func(c *gin.Context) {
 		var q listUserQuery
@@ -72,7 +69,6 @@ func demoBinding() {
 		c.JSON(http.StatusOK, q)
 	})
 
-
 	// ---- 路径参数：Uri 绑定 + 校验 ----
 	router.GET("/users/:id", func(c *gin.Context) {
 		var u userIDURI
@@ -82,7 +78,6 @@ func demoBinding() {
 		}
 		c.JSON(http.StatusOK, gin.H{"id": u.ID})
 	})
-
 
 	// ---- JSON body：用得最多的一个 ----
 	router.POST("/users", func(c *gin.Context) {
@@ -98,7 +93,6 @@ func demoBinding() {
 		// JSON 里没出现的字段保持零值，不报错
 		c.JSON(http.StatusCreated, input)
 	})
-
 
 	//! body 是流，读一次就耗尽：同一请求里第二次 ShouldBindJSON 必然失败
 	//! 表现为「代码一模一样、第二次绑定却报 EOF」的经典灵异现象
@@ -122,6 +116,8 @@ func demoBinding() {
 	showGinRequest(router, http.MethodGet, "/users/42", "")
 	showGinRequest(router, http.MethodGet, "/users/-1", "")
 	showGinRequest(router, http.MethodPost, "/users", `{"name":"saohua","age":25}`)
+	showGinRequest(router, http.MethodPost, "/users", `{"name":"saohua","age":225}`)
+
 	showGinRequest(router, http.MethodPost, "/users", `{"age":25}`)
 	showGinRequest(router, http.MethodPost, "/bind-twice", `{"name":"x"}`)
 

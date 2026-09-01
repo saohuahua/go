@@ -23,7 +23,6 @@ func demoRouter() {
 	// 真实项目直接用 Default：一个 handler panic 不至于打崩整个进程
 	router := gin.New()
 
-
 	// ---- 基本注册：method + path + handler ----
 
 	// gin.HandlerFunc 签名固定：func(c *gin.Context)
@@ -34,7 +33,6 @@ func demoRouter() {
 		// gin.H 就是 map[string]any，写小 JSON 不用先声明 struct
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
-
 
 	// ---- 路径参数：把 URL 中的一段变成变量 ----
 
@@ -51,7 +49,6 @@ func demoRouter() {
 		c.JSON(http.StatusOK, gin.H{"rest": c.Param("rest")})
 	})
 
-
 	// ---- 路由分组：公共前缀 + 组级中间件 ----
 
 	// 按版本或模块分组；组上还能 .Use() 挂中间件（03 章演示）
@@ -62,7 +59,6 @@ func demoRouter() {
 		api.GET("/todos", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"count": 2}) })
 		api.POST("/todos", func(c *gin.Context) { c.Status(http.StatusCreated) })
 	}
-
 
 	// ---- 404 兜底：对应 net_http 手写版里的 default 分支 ----
 	router.NoRoute(func(c *gin.Context) {
@@ -86,7 +82,6 @@ func demoRouter() {
 
 	fmt.Println("🔑 声明式路由：注册即生效；:id 匹配一段，*rest 匹配剩余全部")
 }
-
 
 // showGinRequest 给 router 发一条内存请求并打印结果，全文件夹的 demo 都复用它
 // 不占端口、不阻塞 main（Engine 本身是 http.Handler，直接喂给 httptest 即可）

@@ -48,8 +48,8 @@ func main() {
 	// 真实项目设 gin.ReleaseMode：不打 debug 日志，性能也更好
 	// gin.SetMode(gin.TestMode)
 
-	// demoRouter()     // 01 路由
-	// demoBinding()    // 02 参数绑定
+	// demoRouter() // 01 路由
+	demoBinding() // 02 参数绑定
 	// demoMiddleware() // 03 中间件
 	// demoValidate()   // 04 校验 + 统一响应
 	// demoJWT()        // 05 JWT
