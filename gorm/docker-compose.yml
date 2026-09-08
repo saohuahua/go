@@ -1,0 +1,21 @@
+# 学习用 MySQL 一键启动
+# 启动           docker compose up -d
+# 停止           docker compose down
+# 连数据一起删   docker compose down -v
+# 本机 3306 被占用时 把下面的 3306:3306 改成 3307:3306
+# 并同步修改 01_connect_model.go 里的 dsn 端口
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: learn-gorm-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: learn_gorm
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - learn-gorm-data:/var/lib/mysql
+
+volumes:
+  learn-gorm-data:
