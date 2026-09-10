@@ -49,6 +49,6 @@ go vet ./slices ./map ./gin   # 编译 + 静态检查
 - 已完成：`net_http/`（HTTP Server 预热：Handler/请求响应/路由中间件/内存 TODO API）→ Week2 Day4-7
 - 已完成：`review_practice/`（综合回顾练习：从零补全内存 TODO 服务）
 - 已完成：`gin/`（Gin 框架：路由/参数绑定/中间件/校验/JWT/用 Gin 重写 TODO API）→ Week3 完成
-- 已完成：`gorm/`（GORM + MySQL：连接/模型/CRUD/软删除/关联 Preload/事务/Hook/连接池性能）→ Week4 Day3-4（MySQL SQL 基础同步自补中，gorm/ 目录自带 docker-compose.yml 起 MySQL）
+- 已完成：`gorm/`（GORM + MySQL：连接/模型/CRUD/软删除/关联 Preload/事务/Hook/连接池性能）→ Week4 Day3-4（MySQL SQL 基础同步自补中，当前跑在本地 MySQL 8.0，gorm/ 也留了 docker-compose.yml 备用）
 - 下一步：**用 GORM 重写 TODO 落地分层架构**（cmd/internal/pkg 分层 + Swagger）→ 之后 Week4 后半段 Redis
 - 面试高频清单（切片扩容、Map 底层、GMP 等）在路线文档第四阶段，README 面试速背节对应着写

@@ -18,8 +18,8 @@ func demoCreateRead() {
 	fmt.Println("\n========== 02 增与查 ==========")
 	db := connectDB()
 
-	// 每章开头清空旧数据 保证每次运行输出一致
-	db.Unscoped().Where("1 = 1").Delete(&User{})
+	// 每章开头清空演示表 自增 ID 也归零 每次运行输出完全一致
+	resetTables(db, "users")
 
 	// ---- 增 ----
 
@@ -59,9 +59,10 @@ func demoCreateRead() {
 	fmt.Println("Last 主键最大 =", last.Name)
 
 	// First 第二个参数直接传主键值 最快的查法
+	// 用刚插入的李四的 ID 别写死数字 自增 ID 会随运行环境变化
 	var byID User
-	db.First(&byID, 2)
-	fmt.Println("按主键直查 ID 2 =", byID.Name)
+	db.First(&byID, users[0].ID)
+	fmt.Println("按主键直查 ID", byID.ID, "=", byID.Name)
 
 	fmt.Println()
 
@@ -99,6 +100,7 @@ func demoCreateRead() {
 	fmt.Println("Find 查不到 len =", len(nobody), " 不报错")
 
 	// First 查不到会报 ErrRecordNotFound 这是标准判空姿势
+	// GORM 默认会给它打红色日志 这里日志已调静默所以看不到 真实项目会看到
 	var missing User
 	err := db.Where("age > ?", 99).First(&missing).Error
 	fmt.Println("First 查不到 errors.Is 判定 =", errors.Is(err, gorm.ErrRecordNotFound))

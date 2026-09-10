@@ -49,8 +49,7 @@ func (u *User) AfterFind(tx *gorm.DB) error {
 func demoTransactionHook() {
 	fmt.Println("\n========== 05 事务与 Hook ==========")
 	db := connectDB()
-	db.Unscoped().Where("1 = 1").Delete(&User{})
-	db.Unscoped().Where("1 = 1").Delete(&Account{})
+	resetTables(db, "users", "accounts")
 
 	// ---- Hook 效果 ----
 

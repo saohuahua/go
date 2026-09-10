@@ -18,6 +18,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // DSN 数据库连接字符串
@@ -98,6 +99,10 @@ func connectDB() *gorm.DB {
 		// 物理外键约束会在删数据 迁移时碍事 真实项目更常用逻辑外键
 		// 外键关系只在代码层面保证 建表时不生成物理约束
 		DisableForeignKeyConstraintWhenMigrating: true,
+		// 学习期把默认日志调静默 输出干净
+		// 想看真实 SQL 就在那条查询前加 .Debug() 03 和 04 有示例
+		// 真实项目一般用 logger.Warn 保留慢查询和错误日志
+		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
 		log.Fatalf("连接 MySQL 失败 %v\n请先在本目录执行 docker compose up -d", err)
@@ -123,7 +128,7 @@ func demoConnectModel() {
 	fmt.Println("sys_logs 自定义表名建好 =", db.Migrator().HasTable("sys_logs"))
 
 	// gorm.Model 四字段的实际效果 插一条看自动填充
-	db.Unscoped().Where("1 = 1").Delete(&User{})
+	resetTables(db, "users")
 	u := User{Name: "张三", Email: "zhangsan@t.com", Age: 25}
 	db.Create(&u)
 	fmt.Printf("ID 自增 %d  CreatedAt 自动填 %s  UpdatedAt 自动填 %s\n",
@@ -136,4 +141,13 @@ func demoConnectModel() {
 	//! 新手遇到的第一个 GORM 报错基本是它 拿不准就对照文件顶部的 dsn 抄
 
 	fmt.Println("🔑 内嵌 gorm.Model 主键和两个时间字段全自动维护 DeletedAt 留到 03 讲")
+}
+
+// resetTables 清空演示表并把自增 ID 归零 让每次运行的输出完全一致
+// TRUNCATE 是 MySQL 的清表命令 比 DELETE 快 还会重置自增计数器
+// GORM 没有对应 API 所以用 Exec 执行原生 SQL 这里表名写死没有注入风险
+func resetTables(db *gorm.DB, tables ...string) {
+	for _, t := range tables {
+		db.Exec("TRUNCATE TABLE " + t)
+	}
 }

@@ -19,7 +19,7 @@ import (
 func demoPerformance() {
 	fmt.Println("\n========== 06 性能 ==========")
 	db := connectDB()
-	db.Unscoped().Where("1 = 1").Delete(&User{})
+	resetTables(db, "users")
 
 	// ---- 连接池 ----
 

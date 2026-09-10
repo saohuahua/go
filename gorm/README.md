@@ -11,15 +11,29 @@
 
 ```bash
 cd gorm
-docker compose up -d   # 启动 MySQL 首次拉镜像稍等
 go run .               # 跑全部 demo
 ```
 
+数据库二选一：
+
+- **本地 MySQL**（当前用这个）：装好 MySQL 8.0 后先建库 库要手动建 否则连不上
+
+```sql
+CREATE DATABASE learn_gorm DEFAULT CHARACTER SET utf8mb4;
+```
+
+- **Docker**：`docker compose up -d` 首次拉镜像稍等（`docker-compose.yml` 一直留着 两条路都能走）
+
+其他说明：
+
+- 建表不用管 `AutoMigrate` 只建表不建库 库不存在直接报 `Error 1049 Unknown database`
 - 依赖（gorm、mysql 驱动、bcrypt）已写入根目录 go.mod 无需手动安装
-- 本机 3306 被占用：改 `docker-compose.yml` 的端口映射 再同步改 `01_connect_model.go` 的 dsn
+- DSN 在 `01_connect_model.go` 顶部 本地 MySQL 密码不是 root 就改这里
 - 想单独精读某章：到 `main.go` 注释掉其他调用
-- 想彻底重置数据：`docker compose down -v` 再 `up -d`
-- 每章开头自己清表造数据 单独跑任何一章都没问题
+- 想彻底重置数据：删库重建 或 `docker compose down -v` 再 `up -d`
+- 每章开头 `TRUNCATE` 清表演示数据 自增 ID 一并归零 所以跑多少遍结果都一致
+- GORM 日志默认调成静默 输出干净 想看真实 SQL 就在那条查询前加 `.Debug()`（03、04 有示例）
+- 推荐装可视化工具看表数据：VS Code 的 Database Client 插件（免费）或 DBeaver 方便对照注释里说的表结构
 
 ## 注释标记
 
@@ -97,6 +111,9 @@ Many2Many  多对多       谁也不存谁       中间表 user_tags 存两边�
 6. **AutoMigrate 当生产迁移工具**：它只加列 不删不改 生产表结构变更走 SQL 迁移脚本
 7. **不设 ConnMaxLifetime**：半夜低峰期拿到死连接报 invalid connection 白天测不出来
 8. **循环单条插入**：N 条数据 N 次网络往返 用 `CreateInBatches`
+9. **库没建就直接 run**：`AutoMigrate` 只建表不建库 库不存在报 `Error 1049 Unknown database` 先手动 `CREATE DATABASE`
+10. **Joins 条件写成表名**：`Joins("User")` 时关联表别名是**字段名** `User` 不是表名 `users` 条件写 `users.name` 直接报 `Unknown column 'users.name'`
+11. **清表用 DELETE 后写死自增主键**：`DELETE` 不重置自增计数器 第二次运行 ID 早涨上去了 查不到还不报错（用 `TRUNCATE` 清表 ID 才会归零）
 
 ## 下一步
 

@@ -23,7 +23,7 @@ func adultsScope(db *gorm.DB) *gorm.DB {
 func demoUpdateDelete() {
 	fmt.Println("\n========== 03 改与删 ==========")
 	db := connectDB()
-	db.Unscoped().Where("1 = 1").Delete(&User{})
+	resetTables(db, "users")
 	db.Create(&[]User{
 		{Name: "张三", Email: "zhangsan@t.com", Age: 25},
 		{Name: "李四", Email: "lisi@t.com", Age: 30},

@@ -18,12 +18,9 @@ func demoAssociation() {
 	fmt.Println("\n========== 04 关联与预加载 ==========")
 	db := connectDB()
 
-	// 清空四个表 顺序是先清中间表和子表 最后删 users
-	db.Exec("DELETE FROM article_tags")
-	db.Exec("DELETE FROM user_tags")
-	db.Unscoped().Where("1 = 1").Delete(&Article{})
-	db.Unscoped().Where("1 = 1").Delete(&Tag{})
-	db.Unscoped().Where("1 = 1").Delete(&User{})
+	// 清空本章用到的表 自增 ID 一并归零 保证输出一致
+	// 顺序是先清中间表 再清子表 最后清主表 这是删数据的好习惯
+	resetTables(db, "article_tags", "user_tags", "articles", "tags", "users")
 
 	// ---- 级联创建 一次 Create 连关联数据一起入库 ----
 
@@ -107,8 +104,10 @@ func demoAssociation() {
 	}
 
 	// Joins 预加载 适合 BelongsTo 这种一对一关系 一次 JOIN 全带回来
+	//! GORM 给关联表起的别名是关联字段名 User 不是表名 users
+	//! 条件里写 users.name 直接报 Unknown column 必须写 User.name
 	var arts []Article
-	db.Joins("User").Where("users.name = ?", "作者甲").Find(&arts)
+	db.Joins("User").Where("User.name = ?", "作者甲").Find(&arts)
 	fmt.Println("Joins 预加载 第一篇属于", arts[0].User.Name)
 	// 多对多和大列表别用 Joins 结果集会行数膨胀 老实用 Preload
 
